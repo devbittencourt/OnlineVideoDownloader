@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, send_file, flash, redirect, url_for
+from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 from pytube import YouTube
 import os
 import tempfile
@@ -7,83 +7,6 @@ import platform
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-
-index_html = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YT Video Downloader</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .form-container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-container label {
-            font-weight: bold;
-        }
-        .form-container input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .form-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #0056b3;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="form-container">
-            <h1>YT Video Downloader</h1>
-            <form action="{{ url_for('download') }}" method="post">
-                <label for="video_link">Enter YT video link:</label><br>
-                <input type="text" id="video_link" name="video_link" placeholder="Paste your video link here"><br>
-                <button type="submit">Download Now</button>
-            </form>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="error-message">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
-    </div>
-    <footer style="text-align: center; margin-top: 20px;">By DevBittencourt</footer>
-</body>
-</html>
-"""
 
 def open_downloads_folder():
     system = platform.system()
@@ -97,7 +20,7 @@ def open_downloads_folder():
 
 @app.route('/')
 def index():
-    return render_template_string(index_html)
+    return render_template('index.html')
 
 @app.route('/download', methods=['POST'])
 def download():
@@ -108,7 +31,7 @@ def download():
             try:
                 yt = YouTube(video_link)
                 video = yt.streams.get_highest_resolution()
-                title = yt.title.replace('/', '_')  # Remove slashes from the title to avoid filename issues
+                title = yt.title.replace('/', '_')  
                 filename = f"{title}.mp4"
 
                 temp_dir = tempfile.mkdtemp()
